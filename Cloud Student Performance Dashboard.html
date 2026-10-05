@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud Student Performance Dashboard</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter',sans-serif;
+}
+
+body{
+    background:#080d1c;
+    color:#fff;
+    min-height:100vh;
+}
+
+.app{
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:245px;
+    background:#0d1428;
+    border-right:1px solid #1d2945;
+    padding:25px 18px;
+    position:fixed;
+    top:0;
+    bottom:0;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:0 10px 30px;
+}
+
+.logo-icon{
+    width:40px;
+    height:40px;
+    border-radius:12px;
+    background:linear-gradient(135deg,#00d9ff,#7c3aed);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+}
+
+.logo h2{
+    font-size:17px;
+}
+
+.logo span{
+    color:#00d9ff;
+}
+
+.nav-title{
+    color:#64748b;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:1px;
+    padding:0 12px;
+    margin:12px 0;
+}
+
+.nav a{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color:#94a3b8;
+    text-decoration:none;
+    padding:12px;
+    border-radius:10px;
+    margin:5px 0;
+    font-size:14px;
+    cursor:pointer;
+}
+
+.nav a:hover,
+.nav a.active{
+    background:#16213d;
+    color:#00d9ff;
+}
+
+.bottom-info{
+    position:absolute;
+    bottom:25px;
+    left:18px;
+    right:18px;
+    background:#111b34;
+    border:1px solid #243354;
+    border-radius:14px;
+    padding:15px;
+}
+
+.bottom-info small{
+    color:#64748b;
+}
+
+.bottom-info p{
+    font-size:12px;
+    margin-top:5px;
+    color:#cbd5e1;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:245px;
+    width:calc(100% - 245px);
+    padding:28px;
+}
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.topbar h1{
+    font-size:26px;
+}
+
+.topbar p{
+    color:#64748b;
+    margin-top:6px;
+    font-size:13px;
+}
+
+.profile{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#7c3aed,#00d9ff);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+}
+
+/* STATS */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:25px;
+}
+
+.stat{
+    background:#0d1428;
+    border:1px solid #1d2945;
+    border-radius:16px;
+    padding:20px;
+    position:relative;
+    overflow:hidden;
+}
+
+.stat::after{
+    content:"";
+    position:absolute;
+    width:80px;
+    height:80px;
+    right:-25px;
+    top:-25px;
+    background:#00d9ff;
+    opacity:.07;
+    border-radius:50%;
+}
+
+.stat-icon{
+    width:38px;
+    height:38px;
+    border-radius:10px;
+    background:#16213d;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:15px;
+}
+
+.stat h3{
+    font-size:25px;
+}
+
+.stat p{
+    color:#64748b;
+    font-size:12px;
+    margin-top:5px;
+}
+
+/* CONTENT */
+
+.grid{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px;
+}
+
+.card{
+    background:#0d1428;
+    border:1px solid #1d2945;
+    border-radius:16px;
+    padding:22px;
+}
+
+.card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.card-header h2{
+    font-size:16px;
+}
+
+.card-header span{
+    color:#64748b;
+    font-size:12px;
+}
+
+/* CHART */
+
+.chart{
+    height:245px;
+    display:flex;
+    align-items:end;
+    justify-content:space-around;
+    gap:12px;
+    padding:15px 5px 0;
+    border-bottom:1px solid #243354;
+}
+
+.bar-wrap{
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:end;
+    align-items:center;
+    width:13%;
+}
+
+.bar{
+    width:100%;
+    max-width:45px;
+    border-radius:8px 8px 0 0;
+    background:linear-gradient(to top,#7c3aed,#00d9ff);
+    min-height:15px;
+    transition:.3s;
+}
+
+.bar:hover{
+    filter:brightness(1.3);
+    transform:translateY(-4px);
+}
+
+.bar-label{
+    color:#64748b;
+    font-size:10px;
+    margin-top:8px;
+}
+
+/* PERFORMANCE */
+
+.performance-item{
+    margin-bottom:20px;
+}
+
+.subject-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    margin-bottom:8px;
+}
+
+.subject-row span:last-child{
+    color:#00d9ff;
+    font-weight:600;
+}
+
+.progress{
+    height:7px;
+    background:#18233e;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.progress div{
+    height:100%;
+    border-radius:20px;
+    background:linear-gradient(90deg,#7c3aed,#00d9ff);
+}
+
+/* TABLE */
+
+.table-card{
+    margin-top:20px;
+}
+
+.table-tools{
+    display:flex;
+    gap:10px;
+}
+
+.search{
+    background:#111b34;
+    border:1px solid #243354;
+    color:#fff;
+    border-radius:9px;
+    padding:9px 12px;
+    outline:none;
+    width:190px;
+}
+
+.filter{
+    background:#111b34;
+    border:1px solid #243354;
+    color:#cbd5e1;
+    border-radius:9px;
+    padding:9px;
+    outline:none;
+}
+
+.btn{
+    border:none;
+    background:linear-gradient(135deg,#00bcd4,#7c3aed);
+    color:white;
+    padding:10px 15px;
+    border-radius:9px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.btn:hover{
+    opacity:.85;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    color:#64748b;
+    font-size:11px;
+    text-align:left;
+    padding:13px 10px;
+    border-bottom:1px solid #243354;
+}
+
+td{
+    padding:14px 10px;
+    border-bottom:1px solid #17223a;
+    font-size:12px;
+    color:#cbd5e1;
+}
+
+.student{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.student-avatar{
+    width:34px;
+    height:34px;
+    border-radius:9px;
+    background:#182746;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#00d9ff;
+    font-weight:700;
+}
+
+.badge{
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:10px;
+    font-weight:600;
+}
+
+.excellent{
+    background:#063b35;
+    color:#2dd4bf;
+}
+
+.good{
+    background:#102e49;
+    color:#38bdf8;
+}
+
+.average{
+    background:#3a2c08;
+    color:#fbbf24;
+}
+
+.low{
+    background:#3a121c;
+    color:#fb7185;
+}
+
+.action{
+    background:none;
+    border:none;
+    color:#64748b;
+    cursor:pointer;
+    margin-right:8px;
+}
+
+.action:hover{
+    color:#00d9ff;
+}
+
+/* MODAL */
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.7);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:20;
+}
+
+.modal-box{
+    width:430px;
+    background:#0d1428;
+    border:1px solid #243354;
+    border-radius:18px;
+    padding:25px;
+}
+
+.modal-box h2{
+    margin-bottom:20px;
+}
+
+.form-group{
+    margin-bottom:14px;
+}
+
+.form-group label{
+    display:block;
+    color:#94a3b8;
+    font-size:12px;
+    margin-bottom:6px;
+}
+
+.form-group input,
+.form-group select{
+    width:100%;
+    padding:11px;
+    border-radius:9px;
+    border:1px solid #243354;
+    background:#111b34;
+    color:#fff;
+    outline:none;
+}
+
+.modal-buttons{
+    display:flex;
+    gap:10px;
+    justify-content:flex-end;
+    margin-top:20px;
+}
+
+.cancel{
+    background:#18233e;
+    color:#cbd5e1;
+    border:none;
+    padding:10px 15px;
+    border-radius:9px;
+    cursor:pointer;
+}
+
+/* EMPTY */
+
+.empty{
+    text-align:center;
+    padding:30px;
+    color:#64748b;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1000px){
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:700px){
+    .sidebar{
+        width:70px;
+        padding:15px 8px;
+    }
+
+    .logo h2,
+    .nav a span,
+    .nav-title,
+    .bottom-info{
+        display:none;
+    }
+
+    .logo{
+        padding:0 6px 25px;
+    }
+
+    .main{
+        margin-left:70px;
+        width:calc(100% - 70px);
+        padding:18px;
+    }
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .topbar{
+        align-items:flex-start;
+    }
+
+    .table-tools{
+        flex-wrap:wrap;
+    }
+
+    .search{
+        width:100%;
+    }
+
+    table{
+        min-width:700px;
+    }
+
+    .table-card{
+        overflow-x:auto;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+        <div class="logo-icon">☁</div>
+        <h2>Cloud<span>Edu</span></h2>
+    </div>
+
+    <div class="nav-title">MAIN MENU</div>
+
+    <nav class="nav">
+        <a class="active" onclick="showSection('dashboard',this)">
+            📊 <span>Dashboard</span>
+        </a>
+
+        <a onclick="showSection('students',this)">
+            👨‍🎓 <span>Students</span>
+        </a>
+
+        <a onclick="openModal()">
+            ➕ <span>Add Student</span>
+        </a>
+
+        <a onclick="showSection('performance',this)">
+            📈 <span>Performance</span>
+        </a>
+    </nav>
+
+    <div class="nav-title">SYSTEM</div>
+
+    <nav class="nav">
+        <a onclick="exportData()">
+            ☁️ <span>Export Data</span>
+        </a>
+
+        <a onclick="resetData()">
+            🔄 <span>Reset Data</span>
+        </a>
+    </nav>
+
+    <div class="bottom-info">
+        <small>Cloud Status</small>
+        <p>● Prototype Storage Active</p>
+    </div>
+
+</aside>
+
+<!-- MAIN -->
+
+<main class="main">
+
+    <div class="topbar">
+        <div>
+            <h1>Student Performance</h1>
+            <p>Monitor academic progress and student analytics.</p>
+        </div>
+
+        <div class="profile">
+            <div>
+                <strong>Admin</strong>
+            </div>
+            <div class="avatar">A</div>
+        </div>
+    </div>
+
+    <!-- STATS -->
+
+    <section class="stats">
+
+        <div class="stat">
+            <div class="stat-icon">👨‍🎓</div>
+            <h3 id="totalStudents">0</h3>
+            <p>Total Students</p>
+        </div>
+
+        <div class="stat">
+            <div class="stat-icon">📊</div>
+            <h3 id="averageScore">0%</h3>
+            <p>Average Performance</p>
+        </div>
+
+        <div class="stat">
+            <div class="stat-icon">🏆</div>
+            <h3 id="topStudents">0</h3>
+            <p>Excellent Students</p>
+        </div>
+
+        <div class="stat">
+            <div class="stat-icon">⚠️</div>
+            <h3 id="needAttention">0</h3>
+            <p>Need Attention</p>
+        </div>
+
+    </section>
+
+    <!-- CHART + SUBJECT PERFORMANCE -->
+
+    <section class="grid">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h2>Class Performance</h2>
+                <span>Subject Average</span>
+            </div>
+
+            <div class="chart" id="chart"></div>
+
+        </div>
+
+        <div class="card">
+
+            <div class="card-header">
+                <h2>Subject Analysis</h2>
+                <span>Average</span>
+            </div>
+
+            <div id="subjectPerformance"></div>
+
+        </div>
+
+    </section>
+
+    <!-- STUDENT TABLE -->
+
+    <section class="card table-card" id="studentsSection">
+
+        <div class="card-header">
+
+            <h2>Student Records</h2>
+
+            <div class="table-tools">
+
+                <input
+                    class="search"
+                    id="search"
+                    placeholder="Search student..."
+                    oninput="renderStudents()"
+                >
+
+                <select class="filter" id="gradeFilter" onchange="renderStudents()">
+                    <option value="all">All Grades</option>
+                    <option value="Excellent">Excellent</option>
+                    <option value="Good">Good</option>
+                    <option value="Average">Average</option>
+                    <option value="Low">Low</option>
+                </select>
+
+                <button class="btn" onclick="openModal()">+ Add</button>
+
+            </div>
+
+        </div>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>STUDENT</th>
+                    <th>DEPARTMENT</th>
+                    <th>YEAR</th>
+                    <th>AVERAGE</th>
+                    <th>GRADE</th>
+                    <th>ACTION</th>
+                </tr>
+            </thead>
+
+            <tbody id="studentTable"></tbody>
+
+        </table>
+
+    </section>
+
+</main>
+
+</div>
+
+<!-- MODAL -->
+
+<div class="modal" id="studentModal">
+
+    <div class="modal-box">
+
+        <h2 id="modalTitle">Add Student</h2>
+
+        <input type="hidden" id="editId">
+
+        <div class="form-group">
+            <label>Student Name</label>
+            <input id="studentName" placeholder="Enter student name">
+        </div>
+
+        <div class="form-group">
+            <label>Department</label>
+            <select id="department">
+                <option>Computer Science</option>
+                <option>Information Technology</option>
+                <option>Electronics</option>
+                <option>Mechanical</option>
+                <option>Civil</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Year</label>
+            <select id="year">
+                <option>1st Year</option>
+                <option>2nd Year</option>
+                <option>3rd Year</option>
+                <option>4th Year</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Average Percentage</label>
+            <input id="percentage" type="number" min="0" max="100" placeholder="Enter percentage">
+        </div>
+
+        <div class="modal-buttons">
+
+            <button class="cancel" onclick="closeModal()">
+                Cancel
+            </button>
+
+            <button class="btn" onclick="saveStudent()">
+                Save Student
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const STORAGE_KEY = "cloudStudentPerformance";
+
+let students = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
+    {
+        id:1,
+        name:"Aarav Kumar",
+        department:"Computer Science",
+        year:"3rd Year",
+        percentage:91
+    },
+    {
+        id:2,
+        name:"Meera Sharma",
+        department:"Information Technology",
+        year:"3rd Year",
+        percentage:86
+    },
+    {
+        id:3,
+        name:"Rahul Raj",
+        department:"Computer Science",
+        year:"2nd Year",
+        percentage:78
+    },
+    {
+        id:4,
+        name:"Diya Nair",
+        department:"Electronics",
+        year:"4th Year",
+        percentage:94
+    },
+    {
+        id:5,
+        name:"Vikram Das",
+        department:"Mechanical",
+        year:"3rd Year",
+        percentage:68
+    },
+    {
+        id:6,
+        name:"Ananya Rao",
+        department:"Computer Science",
+        year:"2nd Year",
+        percentage:83
+    },
+    {
+        id:7,
+        name:"Karthik Kumar",
+        department:"Information Technology",
+        year:"4th Year",
+        percentage:72
+    }
+];
+
+let subjectData = {
+    "Java":82,
+    "Python":88,
+    "DBMS":79,
+    "Computer Networks":74,
+    "Web Technology":91,
+    "Cloud Computing":86
+};
+
+function saveToStorage(){
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(students));
+}
+
+function getGrade(score){
+
+    if(score >= 85){
+        return "Excellent";
+    }
+
+    if(score >= 70){
+        return "Good";
+    }
+
+    if(score >= 50){
+        return "Average";
+    }
+
+    return "Low";
+}
+
+function updateDashboard(){
+
+    const total = students.length;
+
+    const average = total
+        ? students.reduce((sum,s)=>sum + Number(s.percentage),0) / total
+        : 0;
+
+    const excellent = students.filter(s=>s.percentage >= 85).length;
+
+    const attention = students.filter(s=>s.percentage < 60).length;
+
+    document.getElementById("totalStudents").textContent = total;
+
+    document.getElementById("averageScore").textContent =
+        average.toFixed(1) + "%";
+
+    document.getElementById("topStudents").textContent = excellent;
+
+    document.getElementById("needAttention").textContent = attention;
+}
+
+function renderStudents(){
+
+    const search =
+        document.getElementById("search").value.toLowerCase();
+
+    const grade =
+        document.getElementById("gradeFilter").value;
+
+    const table =
+        document.getElementById("studentTable");
+
+    const filtered = students.filter(student=>{
+
+        const matchesSearch =
+            student.name.toLowerCase().includes(search) ||
+            student.department.toLowerCase().includes(search);
+
+        const matchesGrade =
+            grade === "all" ||
+            getGrade(student.percentage) === grade;
+
+        return matchesSearch && matchesGrade;
+
+    });
+
+    if(filtered.length === 0){
+
+        table.innerHTML = `
+            <tr>
+                <td colspan="6">
+                    <div class="empty">
+                        No students found.
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    table.innerHTML = filtered.map(student=>{
+
+        const grade = getGrade(student.percentage);
+
+        const badgeClass =
+            grade === "Excellent" ? "excellent" :
+            grade === "Good" ? "good" :
+            grade === "Average" ? "average" : "low";
+
+        const initials =
+            student.name
+            .split(" ")
+            .map(word=>word[0])
+            .join("")
+            .substring(0,2)
+            .toUpperCase();
+
+        return `
+            <tr>
+
+                <td>
+                    <div class="student">
+                        <div class="student-avatar">
+                            ${initials}
+                        </div>
+
+                        <strong>${student.name}</strong>
+                    </div>
+                </td>
+
+                <td>${student.department}</td>
+
+                <td>${student.year}</td>
+
+                <td>${student.percentage}%</td>
+
+                <td>
+                    <span class="badge ${badgeClass}">
+                        ${grade}
+                    </span>
+                </td>
+
+                <td>
+
+                    <button
+                        class="action"
+                        onclick="editStudent(${student.id})">
+                        ✏️
+                    </button>
+
+                    <button
+                        class="action"
+                        onclick="deleteStudent(${student.id})">
+                        🗑️
+                    </button>
+
+                </td>
+
+            </tr>
+        `;
+
+    }).join("");
+
+    updateDashboard();
+}
+
+function renderSubjects(){
+
+    const container =
+        document.getElementById("subjectPerformance");
+
+    container.innerHTML =
+        Object.entries(subjectData).map(([subject,score])=>{
+
+            return `
+                <div class="performance-item">
+
+                    <div class="subject-row">
+                        <span>${subject}</span>
+                        <span>${score}%</span>
+                    </div>
+
+                    <div class="progress">
+                        <div style="width:${score}%"></div>
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
+}
+
+function renderChart(){
+
+    const chart =
+        document.getElementById("chart");
+
+    chart.innerHTML =
+        Object.entries(subjectData).map(([subject,score])=>{
+
+            return `
+                <div class="bar-wrap">
+
+                    <div
+                        class="bar"
+                        style="height:${score}%"
+                        title="${subject}: ${score}%">
+                    </div>
+
+                    <div class="bar-label">
+                        ${subject === "Computer Networks"
+                            ? "CN"
+                            : subject === "Web Technology"
+                            ? "Web"
+                            : subject}
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
+}
+
+function openModal(id=null){
+
+    document.getElementById("studentModal").style.display = "flex";
+
+    if(id){
+
+        const student =
+            students.find(s=>s.id === id);
+
+        document.getElementById("modalTitle").textContent =
+            "Edit Student";
+
+        document.getElementById("editId").value =
+            student.id;
+
+        document.getElementById("studentName").value =
+            student.name;
+
+        document.getElementById("department").value =
+            student.department;
+
+        document.getElementById("year").value =
+            student.year;
+
+        document.getElementById("percentage").value =
+            student.percentage;
+
+    }else{
+
+        document.getElementById("modalTitle").textContent =
+            "Add Student";
+
+        document.getElementById("editId").value = "";
+
+        document.getElementById("studentName").value = "";
+
+        document.getElementById("department").value =
+            "Computer Science";
+
+        document.getElementById("year").value =
+            "1st Year";
+
+        document.getElementById("percentage").value = "";
+
+    }
+}
+
+function closeModal(){
+
+    document.getElementById("studentModal").style.display =
+        "none";
+
+}
+
+function saveStudent(){
+
+    const name =
+        document.getElementById("studentName").value.trim();
+
+    const department =
+        document.getElementById("department").value;
+
+    const year =
+        document.getElementById("year").value;
+
+    const percentage =
+        Number(document.getElementById("percentage").value);
+
+    const editId =
+        document.getElementById("editId").value;
+
+    if(!name){
+        alert("Please enter the student name.");
+        return;
+    }
+
+    if(!percentage && percentage !== 0){
+        alert("Please enter the percentage.");
+        return;
+    }
+
+    if(percentage < 0 || percentage > 100){
+        alert("Percentage must be between 0 and 100.");
+        return;
+    }
+
+    if(editId){
+
+        const student =
+            students.find(s=>s.id == editId);
+
+        student.name = name;
+        student.department = department;
+        student.year = year;
+        student.percentage = percentage;
+
+    }else{
+
+        students.push({
+
+            id:Date.now(),
+
+            name:name,
+
+            department:department,
+
+            year:year,
+
+            percentage:percentage
+
+        });
+
+    }
+
+    saveToStorage();
+
+    renderStudents();
+
+    closeModal();
+
+}
+
+function editStudent(id){
+
+    openModal(id);
+
+}
+
+function deleteStudent(id){
+
+    const student =
+        students.find(s=>s.id === id);
+
+    if(!student) return;
+
+    const confirmDelete =
+        confirm(`Delete ${student.name}?`);
+
+    if(!confirmDelete) return;
+
+    students =
+        students.filter(s=>s.id !== id);
+
+    saveToStorage();
+
+    renderStudents();
+
+}
+
+function resetData(){
+
+    const confirmReset =
+        confirm("Reset all student records to the original demo data?");
+
+    if(!confirmReset) return;
+
+    localStorage.removeItem(STORAGE_KEY);
+
+    location.reload();
+
+}
+
+function exportData(){
+
+    const data =
+        JSON.stringify(students,null,2);
+
+    const blob =
+        new Blob([data],{
+            type:"application/json"
+        });
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const a =
+        document.createElement("a");
+
+    a.href = url;
+
+    a.download = "student-performance-data.json";
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+}
+
+function showSection(section,element){
+
+    document.querySelectorAll(".nav a")
+        .forEach(a=>a.classList.remove("active"));
+
+    if(element){
+        element.classList.add("active");
+    }
+
+    if(section === "students"){
+
+        document
+            .getElementById("studentsSection")
+            .scrollIntoView({
+                behavior:"smooth"
+            });
+
+    }
+
+    if(section === "performance"){
+
+        document
+            .querySelector(".grid")
+            .scrollIntoView({
+                behavior:"smooth"
+            });
+
+    }
+
+    if(section === "dashboard"){
+
+        window.scrollTo({
+            top:0,
+            behavior:"smooth"
+        });
+
+    }
+
+}
+
+window.onclick = function(event){
+
+    const modal =
+        document.getElementById("studentModal");
+
+    if(event.target === modal){
+        closeModal();
+    }
+
+};
+
+renderStudents();
+renderSubjects();
+renderChart();
+updateDashboard();
+
+</script>
+
+</body>
+</html>
